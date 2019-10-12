@@ -1,14 +1,10 @@
 #include "Adafruit_Thermal.h"
-
 #include "SoftwareSerial.h"
+#include "Wire.h"
+#include "S11059.h"
+
 #define TX_PIN 12
 #define RX_PIN 11
-
-SoftwareSerial printSerial(RX_PIN, TX_PIN);
-Adafruit_Thermal printer(&printSerial);
-
-#include <Wire.h>
-#include <S11059.h>
 
 #define SW 4
 #define LED 5
@@ -18,11 +14,14 @@ Adafruit_Thermal printer(&printSerial);
 #define G_th 20
 #define B_th 20
 
+SoftwareSerial printSerial(RX_PIN, TX_PIN);
+Adafruit_Thermal printer(&printSerial);
+
+S11059 colorSensor;
+
 int color_R = 0, color_G = 0, color_B = 0;
 char r_Data[256];
 char res[12];
-
-S11059 colorSensor;
 
 void setup() {
   pinMode(SW, INPUT_PULLUP);
@@ -46,7 +45,6 @@ void setup() {
     Serial.println("start failed");
   }
 
-  //  printer.feed(2);
   printer.setDefault();
 }
 
@@ -91,7 +89,6 @@ void t_data() {
 
 void loop() {
   while (digitalRead(SW));
-  //  tone(BUZZ, 440);
   digitalWrite(LED, 1);
 
   r_data();
@@ -101,20 +98,5 @@ void loop() {
 
   printer.printBarcode(res, CODE128);
 
-  //  noTone(BUZZ);
   digitalWrite(LED, 0);
-
-  //  colorSensor.delay();
-  //  if (colorSensor.update()) {
-  //    Serial.print(colorSensor.getRed());
-  //    Serial.print(",");
-  //    Serial.print(colorSensor.getGreen());
-  //    Serial.print(",");
-  //    Serial.print(colorSensor.getBlue());
-  //    Serial.print(",");
-  //    Serial.print(colorSensor.getIR());
-  //    Serial.println("");
-  //  } else {
-  //    Serial.println("update failed");
-  //  }
 }
