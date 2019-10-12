@@ -14,7 +14,13 @@ Adafruit_Thermal printer(&printSerial);
 #define LED 5
 #define BUZZ 3
 
+#define R_th 30
+#define G_th 30
+#define B_th 30
+
 int color_R = 0, color_G = 0, color_B = 0;
+char r_Data[256];
+char res[12];
 
 S11059 colorSensor;
 
@@ -30,7 +36,7 @@ void setup() {
   digitalWrite(SCL, 0);
   colorSensor.setMode(S11059_MODE_FIXED);
   colorSensor.setGain(S11059_GAIN_HIGH);
-  colorSensor.setTint(S11059_TINT3);
+  colorSensor.setTint(S11059_TINT1);
 
   if (!colorSensor.reset()) {
     Serial.println("reset failed");
@@ -39,29 +45,76 @@ void setup() {
   if (!colorSensor.start()) {
     Serial.println("start failed");
   }
-  printer.feed(2);
-  printer.setDefault(); // Restore printer to defaults
+
+  //  printer.feed(2);
+  printer.setDefault();
+}
+
+void r_data() {
+  /*
+  colorSensor.delay();
+
+  while (colorSensor.getRed() > R_th && colorSensor.getGreen() < G_th && colorSensor.getBlue() < B_th);
+
+  for (int i = 0; i < 256; i++) {
+    if (colorSensor.getRed() < R_th && colorSensor.getGreen() > G_th && colorSensor.getBlue() > B_th) r_Data[i] = 1;
+    else if (colorSensor.getRed() > R_th && colorSensor.getGreen() < G_th && colorSensor.getBlue() < B_th) r_Data[i] = 0;
+    if (colorSensor.getRed() < R_th && colorSensor.getGreen() > G_th && colorSensor.getBlue() > B_th) break;
+  }
+  */
+
+  for (int i = 0; i < 256; i++) r_Data[i] = -1;
+
+  for (int a = 0; a < 4; a++) r_Data[a] = 0;
+  r_Data[3] = 1;
+  r_Data[1] = 1;
+}
+
+void t_data() {
+  String t_Data = "";
+  
+  for (int i = 0; i < 256; i += 4) {
+    if (r_Data[i] == -1) break;
+    if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "0";
+    if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "1";
+    if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 1 && r_Data[i + 3] == 0)  t_Data += "2";
+    if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 1 && r_Data[i + 3] == 1)  t_Data += "3";
+    if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "4";
+    if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "5";
+    if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 1 && r_Data[i + 3] == 0)  t_Data += "6";
+    if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 1 && r_Data[i + 3] == 1)  t_Data += "7";
+    if (r_Data[i] == 1 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "8";
+    if (r_Data[i] == 1 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "9";
+  }
+
+  t_Data.toCharArray(res, 12);
 }
 
 void loop() {
   while (digitalRead(SW));
-  tone(BUZZ, 440);
+  //  tone(BUZZ, 440);
   digitalWrite(LED, 1);
-  colorSensor.delay();
-  colorSensor.update();
 
-  color_R = colorSensor.getRed();
-  color_G = colorSensor.getGreen();
-  color_B = colorSensor.getBlue();
+  r_data();
+  t_data();
 
-  printer.print(F("R: "));
-  printer.print(color_R);
-  printer.print(F("   G: "));
-  printer.print(color_G);
-  printer.print(F("   B: "));
-  printer.print(color_B);
-  printer.println();
-  noTone(BUZZ);
+  // printer.print(F("Barcode:"));
+  printer.printBarcode(res, CODE128);
+
+  //  noTone(BUZZ);
   digitalWrite(LED, 0);
-  delay(200);
+
+  //  colorSensor.delay();
+  //  if (colorSensor.update()) {
+  //    Serial.print(colorSensor.getRed());
+  //    Serial.print(",");
+  //    Serial.print(colorSensor.getGreen());
+  //    Serial.print(",");
+  //    Serial.print(colorSensor.getBlue());
+  //    Serial.print(",");
+  //    Serial.print(colorSensor.getIR());
+  //    Serial.println("");
+  //  } else {
+  //    Serial.println("update failed");
+  //  }
 }
