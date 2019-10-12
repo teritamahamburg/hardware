@@ -14,9 +14,9 @@ Adafruit_Thermal printer(&printSerial);
 #define LED 5
 #define BUZZ 3
 
-#define R_th 30
-#define G_th 30
-#define B_th 30
+#define R_th 20
+#define G_th 20
+#define B_th 20
 
 int color_R = 0, color_G = 0, color_B = 0;
 char r_Data[256];
@@ -51,28 +51,27 @@ void setup() {
 }
 
 void r_data() {
-  /*
+  for (int i = 0; i < 256; i++) r_Data[i] = -1;
+
   colorSensor.delay();
 
   while (colorSensor.getRed() > R_th && colorSensor.getGreen() < G_th && colorSensor.getBlue() < B_th);
 
   for (int i = 0; i < 256; i++) {
-    if (colorSensor.getRed() < R_th && colorSensor.getGreen() > G_th && colorSensor.getBlue() > B_th) r_Data[i] = 1;
-    else if (colorSensor.getRed() > R_th && colorSensor.getGreen() < G_th && colorSensor.getBlue() < B_th) r_Data[i] = 0;
-    if (colorSensor.getRed() < R_th && colorSensor.getGreen() > G_th && colorSensor.getBlue() > B_th) break;
+    while (colorSensor.getRed() < R_th && colorSensor.getGreen() < G_th && colorSensor.getBlue() < B_th);
+
+    if (colorSensor.getRed() < R_th && colorSensor.getGreen() > G_th && colorSensor.getBlue() < B_th) r_Data[i] = 1;
+    while (colorSensor.getRed() < R_th && colorSensor.getGreen() > G_th && colorSensor.getBlue() < B_th);
+    if (colorSensor.getRed() < R_th && colorSensor.getGreen() < G_th && colorSensor.getBlue() > B_th) r_Data[i] = 0;
+    while (colorSensor.getRed() < R_th && colorSensor.getGreen() < G_th && colorSensor.getBlue() > B_th);
+    if (colorSensor.getRed() > R_th && colorSensor.getGreen() < G_th && colorSensor.getBlue() < B_th) break;
   }
-  */
 
-  for (int i = 0; i < 256; i++) r_Data[i] = -1;
-
-  for (int a = 0; a < 4; a++) r_Data[a] = 0;
-  r_Data[3] = 1;
-  r_Data[1] = 1;
 }
 
 void t_data() {
   String t_Data = "";
-  
+
   for (int i = 0; i < 256; i += 4) {
     if (r_Data[i] == -1) break;
     if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "0";
@@ -96,9 +95,10 @@ void loop() {
   digitalWrite(LED, 1);
 
   r_data();
+
+  digitalWrite(LED, 0);
   t_data();
 
-  // printer.print(F("Barcode:"));
   printer.printBarcode(res, CODE128);
 
   //  noTone(BUZZ);
