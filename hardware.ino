@@ -1,28 +1,45 @@
-#include "Adafruit_Thermal.h"
+#include <Wire.h>
+#include <S11059.h>
 
-#include "SoftwareSerial.h"
-#define TX_PIN 12
-#define RX_PIN 11
-
-SoftwareSerial printSerial(RX_PIN, TX_PIN);
-Adafruit_Thermal printer(&printSerial);
+S11059 colorSensor;
 
 void setup() {
-  printSerial.begin(9600);
-  printer.begin();
+  Serial.begin(9600);
+  Wire.begin();
+  digitalWrite(SDA, 0);
+  digitalWrite(SCL, 0);
+  colorSensor.setMode(S11059_MODE_FIXED);
+  colorSensor.setGain(S11059_GAIN_HIGH);
 
-  printer.justify('C');
-  printer.boldOn();
-  printer.println(F("550E8400E29B41D4A716446655000000999\n"));
-  printer.boldOff();
-  printer.justify('L');
+  // * S11059_TINT0: 87.5 us
+  // * S11059_TINT1: 1.4 ms
+  // * S11059_TINT2: 22.4 ms
+  // * S11059_TINT3: 179.2 ms
+  colorSensor.setTint(S11059_TINT3);
 
-  printer.print(F("CODE 39:"));
-  printer.printBarcode("00000", CODE39);
+  if (!colorSensor.reset()) {
+    Serial.println("reset failed");
+  }
 
-  printer.feed(2);
-  printer.setDefault(); // Restore printer to defaults
+  if (!colorSensor.start()) {
+    Serial.println("start failed");
+  }
+
 }
 
 void loop() {
+  colorSensor.delay();
+
+  if (colorSensor.update()) {
+    Serial.print(colorSensor.getBlue());
+    Serial.print(",");
+    Serial.print(colorSensor.getRed());
+    Serial.print(",");
+    Serial.print(colorSensor.getGreen());
+    Serial.print(",");
+    Serial.print(colorSensor.getIR());
+    Serial.println("");
+  } else {
+    Serial.println("update failed");
+  }
 }
