@@ -57,7 +57,7 @@ void r_data() {
 
   while (colorSensor.getRed() > R_th && colorSensor.getGreen() < G_th && colorSensor.getBlue() < B_th);
 
-  for (int i = 0; i < 256; i++) {
+  while(1) {
     while (colorSensor.getRed() < R_th && colorSensor.getGreen() < G_th && colorSensor.getBlue() < B_th);
 
     if (colorSensor.getRed() < R_th && colorSensor.getGreen() > G_th && colorSensor.getBlue() < B_th) r_Data[i] = 1;
