@@ -14,9 +14,6 @@ Adafruit_Thermal printer(&printSerial);
 #define LED 5
 #define BUZZ 3
 
-#define R_th 20
-#define G_th 20
-#define B_th 20
 #define COLOR_THRESHOLD 20
 
 S11059 colorSensor;
