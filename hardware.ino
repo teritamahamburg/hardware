@@ -101,8 +101,6 @@ char* transformData(char *r_Data, char *res, int resSize) {
     if (r_Data[i] == 1 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "9";
   }
 
-  Serial.println("TData: " + t_Data);
-
   t_Data.toCharArray(res, resSize);
   return res;
 }
