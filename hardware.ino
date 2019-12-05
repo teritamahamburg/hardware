@@ -64,6 +64,16 @@ void readDataFromSensor(char *r_Data, int size) {
       else if (colors[2] > colors[0] && colors[2] > colors[1]) pat = 3;
       
       if (pat != -1 && beforePat != pat) {
+
+        // green -> blue
+        if (beforePat == 2 && pat == 3) {
+          r_Data[writed] = 2;
+          writed++;
+
+          if (writed == size) break;
+          continue;
+        }
+
         beforePat = pat;
         if (pat == 2) {
           r_Data[writed] = 1;
@@ -89,16 +99,17 @@ char* transformData(char *r_Data, char *res, int resSize) {
 
   for (int i = 0; i < 256; i += 4) {
     if (r_Data[i] == -1) break;
-    if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "0";
-    if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "1";
-    if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 1 && r_Data[i + 3] == 0)  t_Data += "2";
-    if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 1 && r_Data[i + 3] == 1)  t_Data += "3";
-    if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "4";
-    if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "5";
-    if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 1 && r_Data[i + 3] == 0)  t_Data += "6";
-    if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 1 && r_Data[i + 3] == 1)  t_Data += "7";
-    if (r_Data[i] == 1 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "8";
-    if (r_Data[i] == 1 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "9";
+    else if (r_Data[i] == 2) t_Data += ",";
+    else if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "0";
+    else if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "1";
+    else if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 1 && r_Data[i + 3] == 0)  t_Data += "2";
+    else if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 1 && r_Data[i + 3] == 1)  t_Data += "3";
+    else if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "4";
+    else if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "5";
+    else if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 1 && r_Data[i + 3] == 0)  t_Data += "6";
+    else if (r_Data[i] == 0 && r_Data[i + 1] == 1 && r_Data[i + 2] == 1 && r_Data[i + 3] == 1)  t_Data += "7";
+    else if (r_Data[i] == 1 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "8";
+    else if (r_Data[i] == 1 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "9";
   }
 
   t_Data.toCharArray(res, resSize);
