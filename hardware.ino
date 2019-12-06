@@ -62,29 +62,27 @@ void readDataFromSensor(char *r_Data, int size) {
       else if (colors[0] > colors[1] && colors[0] > colors[2]) pat = 1;
       else if (colors[1] > colors[0] && colors[1] > colors[2]) pat = 2;
       else if (colors[2] > colors[0] && colors[2] > colors[1]) pat = 3;
-      
+
       if (pat != -1 && beforePat != pat) {
 
         // green -> blue
         if (beforePat == 2 && pat == 3) {
-          r_Data[writed] = 2;
-          writed++;
-
-          if (writed == size) break;
-          continue;
-        }
-
-        beforePat = pat;
-        if (pat == 2) {
+          r_Data[writed - 1] = 2;
+          Serial.println("2");
+          // writed++;
+        } else if (beforePat == 0 && pat == 2) {
           r_Data[writed] = 1;
+          Serial.println("1");
           writed++;
-        } else if (pat == 3) {
+        } else if (beforePat == 0 && pat == 3) {
           r_Data[writed] = 0;
+          Serial.println("0");
           writed++;
         } else if (pat == 1) {
           if (redCount == 1) break;
           redCount++;
         }
+        beforePat = pat;
         if (writed == size) break;
       }
     } else {
@@ -99,7 +97,10 @@ char* transformData(char *r_Data, char *res, int resSize) {
 
   for (int i = 0; i < 256; i += 4) {
     if (r_Data[i] == -1) break;
-    else if (r_Data[i] == 2) t_Data += ",";
+    else if (r_Data[i] == 2) {
+      i -= 3;
+      t_Data += ",";
+    }
     else if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 0)  t_Data += "0";
     else if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 0 && r_Data[i + 3] == 1)  t_Data += "1";
     else if (r_Data[i] == 0 && r_Data[i + 1] == 0 && r_Data[i + 2] == 1 && r_Data[i + 3] == 0)  t_Data += "2";
@@ -127,7 +128,10 @@ void loop() {
   char res[12];
   transformData(r_Data, res, 12);
 
-  printer.printBarcode(res, CODE128);
+  Serial.println(r_Data);
+  Serial.println(res);
+
+  //  printer.printBarcode(res, CODE128);
 
   digitalWrite(LED, 0);
 }
