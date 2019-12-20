@@ -270,23 +270,31 @@ char* transformData(char *r_Data, char *res, int resSize) {
   return res;
 }
 
+uint8_t balidate(uint8_t r_Data) {
+  if (0) {
+    
+  }
+  else  return 0;
+}
+
 void loop() {
   while (digitalRead(SW));
   digitalWrite(LED, 1);
-  //
-  //  char r_Data[256];
-  //  readDataFromSensor(r_Data, 256);
-  //
-  //  digitalWrite(LED, 0);
-  //  char res[12];
-  //  transformData(r_Data, res, 12);
-  //
-  //  Serial.println(r_Data);
-  //  Serial.println(res);
-  //
-  //  printer.printBarcode(res, CODE128);
 
-  audioErr1();
+  char r_Data[256];
+  readDataFromSensor(r_Data, 256);
+
+  digitalWrite(LED, 0);
+  char res[12];
+  transformData(r_Data, res, 12);
+
+  Serial.println(r_Data);
+  Serial.println(res);
+
+  if (!balidate(r_Data)) {
+    printer.printBarcode(res, CODE128);
+    audioFuro();
+  }
 
   digitalWrite(LED, 0);
 }
